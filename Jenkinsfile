@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "akshay1092003/python-app"
+    }
+
+    stages {
+
+        stage('Git Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Gitleaks Scan') {
+            steps {
+                sh 'gitleaks detect --source . -v'
+            }
+        }
+
+        stage('SonarQube Scan') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t akshaydevops/python-app'
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL akshaydevops/python-app'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push $IMAGE_NAME'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline SUCCESS'
+        }
+        failure {
+            echo 'Pipeline FAILED'
+        }
+    }
+}
