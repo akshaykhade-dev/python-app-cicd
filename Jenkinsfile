@@ -32,13 +32,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t akshaydevops/python-app'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Trivy Scan') {
             steps {
-                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL akshaydevops/python-app'
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME'
             }
         }
 
