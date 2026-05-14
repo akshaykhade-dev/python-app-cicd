@@ -55,6 +55,19 @@ pipeline {
                 }
             }
         }
+        
+        stage('Remove Old Container') {
+            steps {
+                sh 'docker rm -f python-app || true'
+            }
+        }
+
+        // OPTIONAL DEPLOYMENT STAGE
+        stage('Run New Container') {
+            steps {
+                sh 'docker run -d -p 5000:5000 --name python-app $IMAGE_NAME'
+            }
+        }
     }
 
     post {
