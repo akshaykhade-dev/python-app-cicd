@@ -6,6 +6,7 @@ app = Flask(__name__)
 def home():
     return """
     <h1>🚀 DevOps CI/CD Pipeline Project</h1>
+     <h3>👨‍💻 Developed By: Akshay</h3>
     <p>This application is deployed using Jenkins, Docker, and AWS EC2.</p>
     <p>Tools used:</p>
     <ul>
